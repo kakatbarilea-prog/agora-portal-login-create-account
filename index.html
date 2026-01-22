@@ -1,1 +1,1222 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Agora Health Portal – Auth</title>
+
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Hammersmith+One&family=Lora:wght@400;500;600;700&family=Bree+Serif&display=swap" rel="stylesheet">
+
+  <style>
+    :root{
+      --dark-blue:#0D1B2A;
+      --white:#FAF7F2;
+      --blue-gray:#3D4851;
+      --light-blue:#D6E3F2;
+      --text:#000000;
+
+      --radius-1:18px;
+      --radius-2:26px;
+
+      --shadow: 0 18px 45px rgba(13,27,42,.18);
+      --shadow-soft: 0 12px 28px rgba(13,27,42,.14);
+      --border: rgba(13,27,42,.14);
+    }
+
+    *{ box-sizing:border-box; }
+    html,body{ height:100%; }
+    body{
+      margin:0;
+      font-family:"Lora", serif;
+      color:var(--text);
+      background:
+        radial-gradient(1200px 700px at 15% 10%, rgba(214,227,242,.7), transparent 50%),
+        radial-gradient(1000px 650px at 80% 20%, rgba(61,72,81,.14), transparent 55%),
+        linear-gradient(180deg, #ffffff, var(--white));
+    }
+
+    /* Full-width 2-column layout */
+    .auth-shell{
+      min-height:100vh;
+      display:grid;
+      grid-template-columns: 1fr 1fr;
+      width:100%;
+    }
+
+    .left, .right{
+      min-height:100vh;
+      position:relative;
+    }
+
+    /* Left column content wrapper (centered both ways) */
+    .left{
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      padding: clamp(18px, 3vw, 42px);
+      background: var(--dark-blue);
+    }
+
+    .panel{
+      width:min(800px, 100%);
+      background: transparent;
+      border: 0;
+      box-shadow: none;
+      border-radius: 0;
+      padding: 0;
+      backdrop-filter: none;
+      display:flex;
+      flex-direction:column;
+      align-items:center;
+      justify-content:flex-start; /* move content up slightly */
+      min-height: calc(100vh - 84px);
+      padding-top: 34px; /* slightly higher overall */
+    }
+
+    /* Logo block */
+    .logo{
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      padding: 0;
+      background: transparent;
+      border: 0;
+      border-radius: 0;
+      margin: 0 auto 22px auto;
+      box-shadow: none;
+      user-select:none;
+      padding-bottom: 100px;
+    }
+    .logo span{
+      font-family: "Hammersmith One", sans-serif;
+      letter-spacing: .28em;
+      color: var(--white);
+      font-size: clamp(26px, 3.8vw, 38px);
+      text-transform: uppercase;
+      white-space: nowrap;
+      text-align:center;
+    }
+
+    .title{
+      margin: 6px 0 18px;
+      text-align:center;
+      font-family:"Hammersmith One", sans-serif;
+      letter-spacing:.02em;
+      color: var(--white);
+      font-size: clamp(20px, 2.4vw, 28px);
+      font-weight: 700;
+    }
+
+    .sub{
+      margin: 0 auto 18px;
+      text-align:center;
+      max-width: 62ch;
+      color: rgba(250,247,242,.78);
+      font-size: 14px;
+      line-height: 1.5;
+      font-weight: 600;
+    }
+
+    /* Form */
+    form{ margin:0; width:100%; }
+    .grid-2{
+      display:grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+    .field{
+      display:flex;
+      flex-direction:column;
+      gap: 8px;
+      margin-bottom: 12px;
+    }
+    .label{ display:none; } /* removed */
+
+    .control{
+      position:relative;
+    }
+    input, textarea{
+      width:100%;
+      padding: 14px 14px;
+      border: 1px solid rgba(250,247,242,.22);
+      border-radius: 14px;
+      outline:none;
+      background: rgba(250,247,242,.92);
+      color: var(--text);
+      font-family:"Lora", serif;
+      font-weight: 700;
+      font-size: 14px;
+      transition: border-color .18s ease, box-shadow .18s ease, background .18s ease;
+    }
+    input::placeholder, textarea::placeholder{
+      color: rgba(0,0,0,.45);
+      font-weight: 700;
+    }
+    textarea{
+      min-height: 110px;
+      resize: vertical;
+      line-height: 1.5;
+      font-weight: 700;
+    }
+    input:focus, textarea:focus{
+      border-color: rgba(214,227,242,.88);
+      box-shadow: 0 0 0 4px rgba(214,227,242,.35);
+      background: rgba(250,247,242,1);
+    }
+
+    /* Password eye icon */
+    .icon-btn{
+      position:absolute;
+      right: 10px;
+      top: 50%;
+      transform: translateY(-50%);
+      border: 0;
+      background: transparent;
+      cursor: pointer;
+      padding: 6px;
+      border-radius: 10px;
+      opacity: .82;
+    }
+    .icon-btn:hover{ opacity: 1; }
+    .icon{
+      width: 18px;
+      height: 18px;
+      display:block;
+      fill: rgba(13,27,42,.92);
+    }
+
+    /* CTA buttons with pointed UR + LL, rounded UL + LR */
+    .btn-row{
+      display:flex;
+      align-items:center;
+      justify-content:space-between; /* Skip left, Next right */
+      gap: 12px;
+      margin-top: 22px; /* slightly lower */
+    }
+
+    .btn{
+      position:relative;
+      border:0;
+      cursor:pointer;
+      padding: 12px 16px;
+      min-height: 44px;
+      border-radius: 18px;
+      font-family: "Hammersmith One", sans-serif;
+      letter-spacing:.05em;
+      text-transform: uppercase;
+      font-size: 13px;
+      font-weight: 700;
+      box-shadow: 0 10px 22px rgba(0,0,0,.18);
+      transition: opacity .16s ease, transform .16s ease;
+      user-select:none;
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      gap: 10px;
+      width: auto; /* no full width */
+      min-width: 140px;
+    }
+    .btn:active{ transform: translateY(1px); }
+
+    /* Create pointed corners using pseudo triangles */
+    .btn::after{
+      content:"";
+      position:absolute;
+      top:0;
+      right:0;
+      width: 18px;
+      height: 18px;
+      background: inherit;
+      clip-path: polygon(0 0, 100% 0, 100% 100%);
+      opacity: 1;
+      border-top-right-radius: 0;
+    }
+    .btn::before{
+      content:"";
+      position:absolute;
+      left:0;
+      bottom:0;
+      width: 18px;
+      height: 18px;
+      background: inherit;
+      clip-path: polygon(0 0, 100% 100%, 0 100%);
+      opacity: 1;
+    }
+    /* round UL and LR more */
+    .btn{
+      border-top-left-radius: 22px;
+      border-bottom-right-radius: 22px;
+      border-top-right-radius: 8px;
+      border-bottom-left-radius: 8px;
+    }
+
+    .btn-primary{
+      background: var(--light-blue);
+      color: #000;
+    }
+    .btn-secondary{
+      background: var(--light-blue); /* Next button light blue */
+      color: #000;
+    }
+    .btn-ghost{
+      background: transparent;
+      color: rgba(250,247,242,.88);
+      border: 1px solid rgba(250,247,242,.22);
+      box-shadow:none;
+      min-width: 120px;
+    }
+    .btn-primary:hover,
+    .btn-secondary:hover,
+    .btn-ghost:hover{
+      opacity: .90;
+    }
+
+    .fineprint{
+      margin-top: 16px;
+      font-size: 12px;
+      line-height: 1.55;
+      color: rgba(250,247,242,.78);
+      font-weight: 700;
+      text-align:center;
+    }
+    .link{
+      color: rgba(214,227,242,.98);
+      text-decoration: underline;
+      text-underline-offset: 3px;
+      cursor:pointer;
+      font-weight: 700;
+    }
+
+    /* Right column slideshow */
+    .right{
+      overflow:hidden;
+      background: var(--dark-blue);
+      display:flex;
+      align-items:stretch;
+      justify-content:stretch;
+    }
+    .slidewrap{
+      width:100%;
+      height:100%;
+      position:relative;
+    }
+    .slide{
+      position:absolute;
+      inset:0;
+      opacity:0;
+      transition: opacity .9s ease;
+      background-size: cover;
+      background-position:center;
+      filter: saturate(1.05) contrast(1.02);
+    }
+    .slide.active{ opacity:1; }
+
+    /* Right overlay brand bar */
+    .right-overlay{
+      position:absolute;
+      left: 22px;
+      right: 22px;
+      bottom: 22px;
+      padding: 18px 18px;
+      border-radius: 22px;
+      background: rgba(13,27,42,.64);
+      border: 1px solid rgba(250,247,242,.16);
+      backdrop-filter: blur(10px);
+      box-shadow: 0 18px 40px rgba(0,0,0,.22);
+      max-width: 760px;
+    }
+    .right-overlay h3{
+      margin:0 0 8px;
+      font-family:"Hammersmith One", sans-serif;
+      color: var(--white);
+      font-weight:700;
+      letter-spacing:.04em;
+      font-size: 18px;
+    }
+    .right-overlay p{
+      margin:0;
+      color: rgba(250,247,242,.86);
+      font-weight:700;
+      font-size: 13px;
+      line-height:1.55;
+      max-width: 70ch;
+    }
+
+    /* Tabs / Mode */
+    .mode-tabs{ display:none; } /* removed */
+
+    /* Onboarding form UI */
+    .onboard{
+      display:none;
+      width:100%;
+    }
+    .onboard.active{
+      display:block;
+    }
+
+    .progress{
+      display:flex;
+      flex-direction:column;
+      align-items:center;
+      justify-content:center;
+      gap: 10px;
+      margin: 12px 0 18px;
+    }
+    .dots{
+      display:flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      justify-content:center;
+    }
+    .dot{
+      width: 8px;
+      height: 8px;
+      border-radius: 999px;
+      background: rgba(250,247,242,.26);
+      cursor:pointer;
+      transition: transform .14s ease, opacity .14s ease;
+    }
+    .dot:hover{ transform: translateY(-1px); opacity:.95; }
+    .dot.active{
+      background: rgba(214,227,242,.95);
+    }
+    .stepcount{ display:none; } /* removed */
+
+    .q-title{
+      margin: 6px 0 12px;
+      font-family:"Hammersmith One", sans-serif;
+      color: var(--white);
+      font-weight:700;
+      font-size: 16px;
+      letter-spacing:.02em;
+      line-height:1.35;
+      text-align:center;
+    }
+    .q-required{ display:none; } /* removed */
+
+    /* Bubbles for single/multi */
+    .bubble-grid{
+      display:flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 8px;
+      justify-content:center;
+    }
+    .bubble{
+      border: 1px solid rgba(250,247,242,.22);
+      background: rgba(214,227,242,.90);
+      color: rgba(0,0,0,.84);
+      padding: 10px 12px;
+      border-radius: 999px;
+      font-weight: 700;
+      font-size: 13px;
+      cursor:pointer;
+      user-select:none;
+      transition: opacity .16s ease, transform .16s ease, background .16s ease, border-color .16s ease;
+    }
+    .bubble:hover{ opacity:.92; }
+    .bubble.selected{
+      background: rgba(61,72,81,.86);
+      color: var(--white);
+      border-color: rgba(250,247,242,.20);
+    }
+
+    /* Stress 1-10 radios horizontally */
+    .stress{
+      display:flex;
+      align-items:flex-start;
+      justify-content:space-between;
+      gap: 5px;          /* closer, not super tight */
+      margin-top: 10px;
+      flex-wrap: nowrap;
+      overflow-x: auto;
+      padding-bottom: 6px;
+    }
+    .stress-item{
+      min-width: 40px;   /* closer, but not cramped */
+      display:flex;
+      flex-direction:column;
+      align-items:center;
+      gap: 7px;
+    }
+    .stress-item input{
+      width: 17px;
+      height: 17px;
+      margin:0;
+      accent-color: var(--light-blue);
+      cursor:pointer;
+    }
+    .stress-item span{
+      font-size: 12px;
+      font-weight: 700;
+      color: rgba(250,247,242,.84);
+    }
+
+    /* Toast + Loader */
+    .toast{
+      position:fixed;
+      top: 16px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: rgba(13,27,42,.92);
+      color: var(--white);
+      padding: 12px 14px;
+      border-radius: 16px;
+      box-shadow: 0 18px 40px rgba(0,0,0,.22);
+      border: 1px solid rgba(250,247,242,.14);
+      font-weight: 700;
+      font-size: 13px;
+      opacity:0;
+      pointer-events:none;
+      transition: opacity .22s ease, transform .22s ease;
+      z-index: 999;
+      max-width: min(760px, calc(100vw - 28px));
+      text-align:center;
+    }
+    .toast.show{
+      opacity:1;
+      transform: translateX(-50%) translateY(0);
+    }
+
+    .loader{
+      display:none;
+      align-items:center;
+      justify-content:center;
+      gap: 10px;
+      margin-top: 12px;
+      color: rgba(250,247,242,.86);
+      font-weight: 700;
+      font-size: 13px;
+    }
+    .loader.active{ display:flex; }
+    .spinner{
+      width: 16px;
+      height: 16px;
+      border-radius: 50%;
+      border: 2px solid rgba(214,227,242,.26);
+      border-top-color: rgba(214,227,242,.95);
+      animation: spin .9s linear infinite;
+    }
+    @keyframes spin{ to { transform: rotate(360deg); } }
+
+    /* Responsive */
+    @media (max-width: 980px){
+      .auth-shell{
+        grid-template-columns: 1fr;
+      }
+      .right{
+        display:none; /* images not displayed on mobile */
+      }
+      .left{
+        min-height: 100vh;
+      }
+      .panel{
+        margin-top: 0;
+      }
+      .right-overlay{
+        left: 16px;
+        right: 16px;
+        bottom: 16px;
+      }
+    }
+
+    @media (max-width: 560px){
+      .grid-2{ grid-template-columns: 1fr; }
+      .btn-row{ flex-direction:column; align-items:stretch; }
+      .btn{ width:100%; }
+      .stress-item{ min-width: 38px; }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="toast" id="toast">Saved.</div>
+
+  <div class="auth-shell">
+    <!-- LEFT COLUMN -->
+    <section class="left">
+      <div class="panel" id="panel">
+        <div class="logo"><span>AGORA&nbsp;HEALTH</span></div>
+
+        <!-- CREATE ACCOUNT (step 1) -->
+        <div id="createStep" class="auth-step" style="width:100%;">
+          <h1 class="title">Create your account</h1>
+          <p class="sub" style="display:none;"></p>
+
+          <form id="createForm" autocomplete="on">
+            <div class="grid-2">
+              <div class="field">
+                <div class="label">First Name</div>
+                <div class="control">
+                  <input id="firstName" name="firstName" placeholder="First Name" required>
+                </div>
+              </div>
+              <div class="field">
+                <div class="label">Last Name</div>
+                <div class="control">
+                  <input id="lastName" name="lastName" placeholder="Last Name" required>
+                </div>
+              </div>
+            </div>
+
+            <div class="grid-2">
+              <div class="field">
+                <div class="label">Email</div>
+                <div class="control">
+                  <input id="email" name="email" type="email" placeholder="Email" required>
+                </div>
+              </div>
+              <div class="field">
+                <div class="label">Phone</div>
+                <div class="control">
+                  <input id="phone" name="phone" type="tel" placeholder="Phone" required>
+                </div>
+              </div>
+            </div>
+
+            <div class="field">
+              <div class="label">Password</div>
+              <div class="control">
+                <input id="password" name="password" type="password" placeholder="Password" required>
+                <button class="icon-btn" type="button" data-toggle="password" aria-label="Toggle password visibility">
+                  <svg class="icon" viewBox="0 0 24 24" aria-hidden="true">
+                    <path d="M12 5c5.5 0 9.6 4.1 11 7-1.4 2.9-5.5 7-11 7S2.4 14.9 1 12c1.4-2.9 5.5-7 11-7Zm0 2C7.7 7 4.4 10 3.2 12 4.4 14 7.7 17 12 17s7.6-3 8.8-5C19.6 10 16.3 7 12 7Zm0 2.5A2.5 2.5 0 1 1 12 14a2.5 2.5 0 0 1 0-5Z"/>
+                  </svg>
+                </button>
+              </div>
+            </div>
+
+            <div class="field">
+              <div class="label">Confirm Password</div>
+              <div class="control">
+                <input id="confirmPassword" name="confirmPassword" type="password" placeholder="Confirm Password" required>
+                <button class="icon-btn" type="button" data-toggle="confirmPassword" aria-label="Toggle confirm password visibility">
+                  <svg class="icon" viewBox="0 0 24 24" aria-hidden="true">
+                    <path d="M12 5c5.5 0 9.6 4.1 11 7-1.4 2.9-5.5 7-11 7S2.4 14.9 1 12c1.4-2.9 5.5-7 11-7Zm0 2C7.7 7 4.4 10 3.2 12 4.4 14 7.7 17 12 17s7.6-3 8.8-5C19.6 10 16.3 7 12 7Zm0 2.5A2.5 2.5 0 1 1 12 14a2.5 2.5 0 0 1 0-5Z"/>
+                  </svg>
+                </button>
+              </div>
+            </div>
+
+            <div class="btn-row" style="justify-content:flex-end;">
+              <button class="btn btn-primary" type="submit" id="btnCreateNext">Next</button>
+            </div>
+
+            <div class="fineprint">
+              By proceeding, you agree to the <span class="link">Terms of Service</span> and <span class="link">Privacy Policy</span>.<br>
+              Already have an account? <span class="link" id="linkToLogin">Log In</span>
+            </div>
+          </form>
+        </div>
+
+        <!-- LOG IN -->
+        <div id="loginStep" class="auth-step" style="display:none; width:100%;">
+          <h1 class="title">Log in to Agora Health Portal</h1>
+          <p class="sub">Welcome back. Enter your details to continue.</p>
+
+          <form id="loginForm" autocomplete="on">
+            <div class="field">
+              <div class="label">Email</div>
+              <div class="control">
+                <input id="loginEmail" name="loginEmail" type="email" placeholder="Email" required>
+              </div>
+            </div>
+
+            <div class="field">
+              <div class="label">Enter Password</div>
+              <div class="control">
+                <input id="loginPassword" name="loginPassword" type="password" placeholder="Enter Password" required>
+                <button class="icon-btn" type="button" data-toggle="loginPassword" aria-label="Toggle password visibility">
+                  <svg class="icon" viewBox="0 0 24 24" aria-hidden="true">
+                    <path d="M12 5c5.5 0 9.6 4.1 11 7-1.4 2.9-5.5 7-11 7S2.4 14.9 1 12c1.4-2.9 5.5-7 11-7Zm0 2C7.7 7 4.4 10 3.2 12 4.4 14 7.7 17 12 17s7.6-3 8.8-5C19.6 10 16.3 7 12 7Zm0 2.5A2.5 2.5 0 1 1 12 14a2.5 2.5 0 0 1 0-5Z"/>
+                  </svg>
+                </button>
+              </div>
+            </div>
+
+            <div class="btn-row" style="justify-content:flex-end;">
+              <button class="btn btn-primary" type="submit">Log In</button>
+            </div>
+
+            <div class="fineprint">
+              <span class="link">Forget Password?</span><br>
+              Don’t have an account? <span class="link" id="linkToCreate">Create Account</span>
+            </div>
+          </form>
+        </div>
+
+        <!-- ONBOARDING -->
+        <div id="onboard" class="onboard">
+          <h1 class="title" style="display:none;">Quick onboarding</h1>
+          <p class="sub" id="onboardSub" style="margin-top:0;">Answer a few questions so we can tailor your experience.</p>
+
+          <div class="progress">
+            <div class="dots" id="dots"></div>
+          </div>
+
+          <div id="questionHost"></div>
+
+          <div class="btn-row">
+            <button class="btn btn-ghost" type="button" id="btnSkip">Skip</button>
+            <button class="btn btn-secondary" type="button" id="btnNextQ">Next</button>
+          </div>
+
+          <div class="loader" id="loader">
+            <div class="spinner"></div>
+            <div>Submitting…</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- RIGHT COLUMN (Slideshow) -->
+    <section class="right" aria-hidden="true">
+      <div class="slidewrap" id="slidewrap">
+        <div class="slide s1 active" style="background-image:url('https://images.squarespace-cdn.com/content/v1/68fa7e5f5477ff66f851e3c8/1765326332699-JURNB50LOYV5ONA1ZJID/unsplash-image-JHDqhEFZJjs.jpg?format=2500w');"></div>
+        <div class="slide s2" style="background-image:url('https://images.squarespace-cdn.com/content/v1/68fa7e5f5477ff66f851e3c8/1765326021544-Z50MI956FY4DUKSFAIGQ/unsplash-image-d3bYmnZ0ank.jpg?format=2500w');"></div>
+        <div class="slide s3" style="background-image:url('https://images.squarespace-cdn.com/content/v1/68fa7e5f5477ff66f851e3c8/1764012865783-YLLOD32SA7L1TIJCAFF1/unsplash-image-vnk3wLZAEWM.jpg?format=2500w');"></div>
+
+        <div class="right-overlay">
+          <h3>Precision coaching. Concierge support.</h3>
+          <p>
+            A premium, streamlined portal experience for onboarding, membership, and ongoing communication —
+            designed in Agora Health’s signature palette.
+          </p>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <script>
+    /***********************
+     * Small helpers
+     ***********************/
+    const $ = (sel, root=document) => root.querySelector(sel);
+    const $$ = (sel, root=document) => Array.from(root.querySelectorAll(sel));
+
+    function showToast(msg){
+      const t = $("#toast");
+      t.textContent = msg;
+      t.classList.add("show");
+      setTimeout(() => t.classList.remove("show"), 2200);
+    }
+
+    function togglePassword(inputId){
+      const el = document.getElementById(inputId);
+      if(!el) return;
+      el.type = (el.type === "password") ? "text" : "password";
+    }
+
+    /***********************
+     * Slideshow (right)
+     ***********************/
+    const slides = $$(".slide", $("#slidewrap"));
+    let slideIndex = 0;
+    setInterval(() => {
+      slides[slideIndex].classList.remove("active");
+      slideIndex = (slideIndex + 1) % slides.length;
+      slides[slideIndex].classList.add("active");
+    }, 4500);
+
+    /***********************
+     * Mode switching
+     ***********************/
+    const createStep = $("#createStep");
+    const loginStep  = $("#loginStep");
+    const onboardEl  = $("#onboard");
+
+    function setMode(mode){
+      const isCreate = mode === "create";
+
+      // Never show onboarding in login mode
+      onboardEl.classList.remove("active");
+      createStep.style.display = isCreate ? "block" : "none";
+      loginStep.style.display  = isCreate ? "none"  : "block";
+    }
+
+    $("#linkToLogin").addEventListener("click", () => setMode("login"));
+    $("#linkToCreate").addEventListener("click", () => setMode("create"));
+
+    /***********************
+     * Password eyes
+     ***********************/
+    $$(".icon-btn").forEach(btn => {
+      const target = btn.getAttribute("data-toggle");
+      btn.addEventListener("click", () => togglePassword(target));
+    });
+
+    /***********************
+     * Onboarding questions
+     * - no more than 2 per page
+     * - bubbles for single/multi selects
+     * - stress 1-10 radios horizontal
+     ***********************/
+    const onboardingPages = [
+      /* Combined: Age + Starting Weight (ONE page) */
+      {
+        title: "Age and starting body weight",
+        fields: [
+          { key:"age", type:"single", options:["18-24","25-34","35-44","45-54","55-64","65+"] },
+          { key:"startingWeight", type:"single", options:["< 120 lbs","120–150 lbs","151–180 lbs","181–210 lbs","211–240 lbs","241–270 lbs","271+ lbs","Other"] },
+          { key:"startingWeightOther", type:"textarea", placeholder:"Please describe", showIf:{ key:"startingWeight", equals:"Other" } }
+        ],
+        layout:"two-bubbles"
+      },
+
+      {
+        title: "Describe your current health/fitness related goals",
+        subtitle: "Build muscle, lose body fat, change eating/lifestyle habits, health issue, etc.",
+        fields: [
+          { key:"goals", type:"multi", options:["Build muscle","Lose body fat","Improve strength","Improve energy","Improve sleep","Improve digestion","Improve labs/biomarkers","Create consistent habits","Address a health issue","Other"] },
+          { key:"goalsOther", type:"textarea", placeholder:"Please describe", showIf:{ key:"goals", includes:"Other" } }
+        ]
+      },
+      {
+        title: "What have been your biggest obstacles in making progress?",
+        fields: [
+          { key:"obstacles", type:"multi", options:["Time / schedule","Stress","Inconsistent routine","Travel / lifestyle","Nutrition consistency","Cravings","Training plan confusion","Sleep issues","Motivation","Accountability","Injury limitations","Other"] },
+          { key:"obstaclesOther", type:"textarea", placeholder:"Please describe", showIf:{ key:"obstacles", includes:"Other" } }
+        ]
+      },
+
+      {
+        title: "Which of the following are you interested in?",
+        fields: [
+          {
+            key:"tierInterest",
+            type:"multi",
+            options:[
+              "Tier 1: Foundation Plan",
+              "Tier 2: The Optimization Concierge",
+              "Tier 3: The 360 Health Experience"
+            ]
+          }
+        ]
+      },
+
+      {
+        title: "What does your current meal plan, or typical day of eating look like?",
+        fields: [
+          { key:"mealPlan", type:"multi", options:["No set plan","High protein focus","Low carb focus","Balanced meals","Mostly eating out","Meal prep routine","Inconsistent / varies day-to-day","Other"] },
+          { key:"mealPlanDetails", type:"textarea", placeholder:"Please describe", showIf:{ key:"mealPlan", includes:"Other" } }
+        ]
+      },
+      {
+        title: "How many meals out do you currently have per week?",
+        fields: [
+          { key:"mealsOutPerWeek", type:"single", options:["0","1-2","3-5","6-9","10+","Other"] },
+          { key:"mealsOutOther", type:"textarea", placeholder:"Please describe", showIf:{ key:"mealsOutPerWeek", equals:"Other" } }
+        ]
+      },
+      {
+        title: "Which nutrition plan would you be most comfortable with?",
+        fields: [
+          {
+            key:"nutritionPlan",
+            type:"multi",
+            options:[
+              "Macros with suggested food sources to pick and choose from",
+              "No set meals or macros, general guide to better eating habits and list of food sources",
+              "Other"
+            ]
+          },
+          { key:"nutritionPlanOther", type:"textarea", placeholder:"Please describe", showIf:{ key:"nutritionPlan", includes:"Other" } }
+        ]
+      },
+      {
+        title: "Any specific foods you are allergic to or just don’t enjoy eating?",
+        fields: [
+          { key:"foodPreferences", type:"multi", options:["Dairy","Gluten","Eggs","Shellfish","Peanuts","Tree nuts","Soy","Red meat","Pork","Fish","None","Other"] },
+          { key:"foodPreferencesNotes", type:"textarea", placeholder:"Please describe", showIf:{ key:"foodPreferences", includes:"Other" } }
+        ]
+      },
+      {
+        title: "Any digestive/GI issues that affect you daily?",
+        fields: [
+          { key:"giIssues", type:"multi", options:["None","Bloating","Reflux / heartburn","IBS symptoms","Constipation","Diarrhea","Food sensitivities","Stomach pain","Other"] },
+          { key:"giIssuesOther", type:"textarea", placeholder:"Please describe", showIf:{ key:"giIssues", includes:"Other" } }
+        ]
+      },
+
+      {
+        title: "What is your occupation?",
+        fields: [
+          { key:"occupation", type:"single", options:["Office / desk-based","Sales / client-facing","Healthcare","Trades / labor","Remote / work-from-home","Entrepreneur / business owner","Student","Other"] },
+          { key:"occupationOther", type:"textarea", placeholder:"Please describe", showIf:{ key:"occupation", equals:"Other" } }
+        ]
+      },
+      {
+        title: "Average hours per day spent working?",
+        fields: [
+          { key:"workHours", type:"single", options:["< 4 hrs","4–6 hrs","6–8 hrs","8–10 hrs","10+ hrs","Other"] },
+          { key:"workHoursOther", type:"textarea", placeholder:"Please describe", showIf:{ key:"workHours", equals:"Other" } }
+        ]
+      },
+
+      {
+        title: "Rate your average daily stress levels 1–10",
+        fields: [
+          { key:"stressLevel", type:"stress10" }
+        ]
+      },
+      {
+        title: "Do you drink alcohol? If so, how many times per week?",
+        fields: [
+          {
+            key:"alcohol",
+            type:"multi",
+            options:[
+              "No alcohol",
+              "1-2 drinks per week",
+              "2-4 drinks per week",
+              "4-6 drinks per week",
+              "More than 6 drinks per week",
+              "Other"
+            ]
+          },
+          { key:"alcoholOther", type:"textarea", placeholder:"Please describe", showIf:{ key:"alcohol", includes:"Other" } }
+        ]
+      },
+
+      {
+        title: "Describe your current exercise regimen (or ideal regimen)",
+        fields: [
+          { key:"exerciseRegimen", type:"multi", options:["Strength training","Cardio","HIIT","Sports / recreation","Yoga / mobility","Walking","No consistent training","Other"] },
+          { key:"exerciseNotes", type:"textarea", placeholder:"Please describe", showIf:{ key:"exerciseRegimen", includes:"Other" } }
+        ]
+      },
+      {
+        title: "Any supplements/medications you are currently using?",
+        fields: [
+          { key:"supplementsMeds", type:"multi", options:["None","Multivitamin","Protein powder","Creatine","Omega-3","Magnesium","Vitamin D","Probiotics","Prescription medication","Other"] },
+          { key:"supplementsNotes", type:"textarea", placeholder:"Please describe", showIf:{ key:"supplementsMeds", includes:"Other" } }
+        ]
+      },
+      {
+        title: "Any relevant health issues/injuries?",
+        fields: [
+          { key:"healthIssues", type:"multi", options:["None","Back pain","Knee pain","Shoulder pain","Hip pain","Neck pain","Prior surgery","Chronic condition","Other"] },
+          { key:"healthIssuesNotes", type:"textarea", placeholder:"Please describe", showIf:{ key:"healthIssues", includes:"Other" } }
+        ]
+      },
+      {
+        title: "What is your sleep schedule like?",
+        fields: [
+          { key:"sleepSchedule", type:"multi", options:["< 6 hrs/night","6–7 hrs/night","7–8 hrs/night","8+ hrs/night","Inconsistent bedtime","Waking during night","Good sleep hygiene","Poor sleep hygiene","Other"] },
+          { key:"sleepNotes", type:"textarea", placeholder:"Please describe", showIf:{ key:"sleepSchedule", includes:"Other" } }
+        ]
+      },
+
+      {
+        title: "Do you have any recent lab work to share?",
+        fields: [
+          { key:"recentLabs", type:"single", options:["Yes","No"] },
+          { key:"recentLabsDetails", type:"textarea", placeholder:"Please describe", showIf:{ key:"recentLabs", equals:"Yes" } }
+        ]
+      },
+
+      {
+        title: "Anything else relevant to share?",
+        fields: [
+          { key:"anythingElse", type:"textarea", placeholder:"Family dynamics, travel commitments, schedule constraints, etc." }
+        ],
+        isLast: true
+      }
+    ];
+
+    const pages = onboardingPages;
+
+    const answers = {};
+    let pageIndex = 0;
+
+    function renderDots(){
+      const dots = $("#dots");
+      dots.innerHTML = "";
+      pages.forEach((_, i) => {
+        const d = document.createElement("div");
+        d.className = "dot" + (i === pageIndex ? " active" : "");
+        d.title = `Question ${i+1}`;
+        d.addEventListener("click", () => {
+          pageIndex = i;
+          renderPage();
+        });
+        dots.appendChild(d);
+      });
+    }
+
+    function renderPage(){
+      renderDots();
+      const host = $("#questionHost");
+      host.innerHTML = "";
+
+      const page = pages[pageIndex];
+
+      const title = document.createElement("div");
+      title.className = "q-title";
+      title.textContent = page.title;
+      host.appendChild(title);
+
+      if(page.subtitle){
+        const sub = document.createElement("div");
+        sub.className = "sub";
+        sub.style.margin = "0 auto 14px";
+        sub.style.color = "rgba(250,247,242,.78)";
+        sub.style.fontWeight = "600";
+        sub.style.fontSize = "13px";
+        sub.textContent = page.subtitle;
+        host.appendChild(sub);
+      }
+
+      const fieldsWrap = document.createElement("div");
+      host.appendChild(fieldsWrap);
+
+      if(page.layout === "two"){
+        const grid = document.createElement("div");
+        grid.className = "grid-2";
+        page.fields.forEach(f => {
+          if(!shouldShowField(f)) return;
+          grid.appendChild(renderField(f));
+        });
+        fieldsWrap.appendChild(grid);
+      } else if(page.layout === "two-bubbles"){
+        const grid = document.createElement("div");
+        grid.className = "grid-2";
+        page.fields.forEach(f => {
+          if(!shouldShowField(f)) return;
+          const fieldWrap = document.createElement("div");
+          fieldWrap.className = "field";
+          fieldWrap.appendChild(renderField(f));
+          grid.appendChild(fieldWrap);
+        });
+        fieldsWrap.appendChild(grid);
+      } else {
+        page.fields.forEach(f => {
+          if(!shouldShowField(f)) return;
+          fieldsWrap.appendChild(renderField(f));
+        });
+      }
+
+      $("#btnNextQ").textContent = page.isLast ? "Submit" : "Next";
+    }
+
+    function shouldShowField(field){
+      if(!field.showIf) return true;
+
+      const rule = field.showIf;
+      const current = answers[rule.key];
+
+      if("equals" in rule){
+        return current === rule.equals;
+      }
+      if("includes" in rule){
+        return Array.isArray(current) && current.includes(rule.includes);
+      }
+      return true;
+    }
+
+    function renderField(field){
+      const wrap = document.createElement("div");
+      wrap.className = "field";
+
+      // Text/number
+      if(field.type === "text" || field.type === "number" || field.type === "email" || field.type === "tel"){
+        const input = document.createElement("input");
+        input.type = (field.type === "number") ? "number" : "text";
+        input.placeholder = field.placeholder || "";
+        input.value = answers[field.key] ?? "";
+        input.addEventListener("input", () => answers[field.key] = input.value);
+        wrap.appendChild(input);
+        return wrap;
+      }
+
+      // Textarea
+      if(field.type === "textarea"){
+        const ta = document.createElement("textarea");
+        ta.placeholder = field.placeholder || "";
+        ta.value = answers[field.key] ?? "";
+        ta.addEventListener("input", () => answers[field.key] = ta.value);
+        wrap.appendChild(ta);
+        return wrap;
+      }
+
+      // Single / Multi bubbles
+      if(field.type === "single" || field.type === "multi"){
+        const grid = document.createElement("div");
+        grid.className = "bubble-grid";
+
+        const current = answers[field.key] ?? (field.type === "multi" ? [] : null);
+
+        field.options.forEach(opt => {
+          const b = document.createElement("div");
+          b.className = "bubble";
+
+          const selected = (field.type === "multi")
+            ? Array.isArray(current) && current.includes(opt)
+            : current === opt;
+
+          if(selected) b.classList.add("selected");
+          b.textContent = opt;
+
+          b.addEventListener("click", () => {
+            if(field.type === "single"){
+              answers[field.key] = opt;
+              renderPage();
+            } else {
+              const arr = Array.isArray(answers[field.key]) ? answers[field.key] : [];
+              const idx = arr.indexOf(opt);
+              if(idx >= 0) arr.splice(idx, 1);
+              else arr.push(opt);
+              answers[field.key] = arr;
+              b.classList.toggle("selected");
+
+              if(field.options.includes("Other")){
+                renderPage();
+              }
+            }
+          });
+
+          grid.appendChild(b);
+        });
+
+        wrap.appendChild(grid);
+        return wrap;
+      }
+
+      // Stress 1-10
+      if(field.type === "stress10"){
+        const bar = document.createElement("div");
+        bar.className = "stress";
+        const current = answers[field.key] ?? "";
+
+        for(let i=1;i<=10;i++){
+          const item = document.createElement("label");
+          item.className = "stress-item";
+
+          const radio = document.createElement("input");
+          radio.type = "radio";
+          radio.name = "stress10";
+          radio.value = String(i);
+          radio.checked = String(current) === String(i);
+          radio.addEventListener("change", () => answers[field.key] = String(i));
+
+          const lbl = document.createElement("span");
+          lbl.textContent = String(i);
+
+          item.appendChild(radio);
+          item.appendChild(lbl);
+          bar.appendChild(item);
+        }
+
+        wrap.appendChild(bar);
+        return wrap;
+      }
+
+      const fallback = document.createElement("div");
+      fallback.textContent = "Unsupported field.";
+      wrap.appendChild(fallback);
+      return wrap;
+    }
+
+    function openOnboarding(){
+      createStep.style.display = "none";
+      loginStep.style.display = "none";
+      onboardEl.classList.add("active");
+      pageIndex = 0;
+      renderPage();
+    }
+
+    function closeOnboardingReset(){
+      onboardEl.classList.remove("active");
+      setMode("create");
+      $("#createForm").reset();
+      Object.keys(answers).forEach(k => delete answers[k]);
+      pageIndex = 0;
+    }
+
+    $("#btnSkip").addEventListener("click", () => {
+      if(pageIndex < pages.length - 1){
+        pageIndex++;
+        renderPage();
+      } else {
+        submitOnboarding();
+      }
+    });
+
+    $("#btnNextQ").addEventListener("click", () => {
+      const page = pages[pageIndex];
+
+      if(page.isLast){
+        submitOnboarding();
+        return;
+      }
+
+      pageIndex++;
+      renderPage();
+    });
+
+    function submitOnboarding(){
+      const loader = $("#loader");
+      loader.classList.add("active");
+
+      setTimeout(() => {
+        loader.classList.remove("active");
+        showToast("Account created successfully.");
+        closeOnboardingReset();
+      }, 1200);
+    }
+
+    /***********************
+     * Create Account flow
+     ***********************/
+    $("#createForm").addEventListener("submit", (e) => {
+      e.preventDefault();
+
+      const pw = $("#password").value;
+      const cpw = $("#confirmPassword").value;
+      if(pw !== cpw){
+        showToast("Passwords don’t match.");
+        return;
+      }
+      if(pw.length < 8){
+        showToast("Use a password of at least 8 characters.");
+        return;
+      }
+
+      answers.firstName = $("#firstName").value.trim();
+      answers.lastName = $("#lastName").value.trim();
+      answers.email = $("#email").value.trim();
+      answers.phone = $("#phone").value.trim();
+
+      openOnboarding();
+    });
+
+    /***********************
+     * Login flow
+     ***********************/
+    $("#loginForm").addEventListener("submit", (e) => {
+      e.preventDefault();
+
+      const loader = $("#loader");
+      createStep.style.display = "none";
+      loginStep.style.display  = "none";
+      onboardEl.classList.remove("active");
+      loader.classList.add("active");
+
+      setTimeout(() => {
+        loader.classList.remove("active");
+        showToast("Successfully logged in.");
+        setMode("create");
+      }, 1100);
+    });
+
+    /***********************
+     * Default mode
+     ***********************/
+    setMode("create");
+  </script>
+</body>
+</html>
 
