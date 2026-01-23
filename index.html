@@ -413,6 +413,31 @@
       margin-top: 8px;
       justify-content:center;
     }
+
+    /* Persona bubbles: 2 columns (2 options per row) */
+    .bubble-grid.persona-grid{
+      display:grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      justify-content:stretch;
+      margin-top: 10px;
+    }
+    .bubble-grid.persona-grid .bubble{
+      width: 100%;
+      text-align:center;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      min-height: 44px;
+      padding: 10px 12px;
+    }
+
+    @media (max-width: 560px){
+      .bubble-grid.persona-grid{
+        grid-template-columns: 1fr;
+      }
+    }
+
     .bubble{
       border: 1px solid rgba(250,247,242,.22);
       background: rgba(214,227,242,.90);
@@ -551,71 +576,91 @@
       <div class="panel" id="panel">
         <div class="logo"><span>AGORA&nbsp;HEALTH</span></div>
 
-        <!-- CREATE ACCOUNT (step 1) -->
+        <!-- CREATE ACCOUNT (multi-step before onboarding) -->
         <div id="createStep" class="auth-step" style="width:100%;">
           <h1 class="title">Create your account</h1>
           <p class="sub" style="display:none;"></p>
 
           <form id="createForm" autocomplete="on">
-            <div class="grid-2">
-              <div class="field">
-                <div class="label">First Name</div>
-                <div class="control">
-                  <input id="firstName" name="firstName" placeholder="First Name" required>
-                </div>
-              </div>
-              <div class="field">
-                <div class="label">Last Name</div>
-                <div class="control">
-                  <input id="lastName" name="lastName" placeholder="Last Name" required>
-                </div>
-              </div>
-            </div>
-
-            <div class="grid-2">
+            <!-- STEP 1: Email only -->
+            <div id="createStepEmail">
               <div class="field">
                 <div class="label">Email</div>
                 <div class="control">
                   <input id="email" name="email" type="email" placeholder="Email" required>
                 </div>
               </div>
+
+              <div class="btn-row">
+                <button class="btn btn-primary btn-auth-right" type="button" id="btnEmailNext">Next</button>
+              </div>
+            </div>
+
+            <!-- STEP 2: Persona question -->
+            <div id="createStepPersona" style="display:none;">
+              <div class="q-title">What best describes you?</div>
+
+              <div class="bubble-grid persona-grid" id="personaGrid"></div>
+
+              <div class="btn-row">
+                <button class="btn btn-ghost" type="button" id="btnPersonaBack">Back</button>
+                <button class="btn btn-secondary" type="button" id="btnPersonaNext">Next</button>
+              </div>
+            </div>
+
+            <!-- STEP 3: Account details -->
+            <div id="createStepDetails" style="display:none;">
+              <div class="grid-2">
+                <div class="field">
+                  <div class="label">First Name</div>
+                  <div class="control">
+                    <input id="firstName" name="firstName" placeholder="First Name" required>
+                  </div>
+                </div>
+                <div class="field">
+                  <div class="label">Last Name</div>
+                  <div class="control">
+                    <input id="lastName" name="lastName" placeholder="Last Name" required>
+                  </div>
+                </div>
+              </div>
+
               <div class="field">
                 <div class="label">Phone</div>
                 <div class="control">
                   <input id="phone" name="phone" type="tel" placeholder="Phone" required>
                 </div>
               </div>
-            </div>
 
-            <div class="field">
-              <div class="label">Password</div>
-              <div class="control">
-                <input id="password" name="password" type="password" placeholder="Password" required>
-                <button class="icon-btn" type="button" data-toggle="password" aria-label="Toggle password visibility">
-                  <svg class="icon" viewBox="0 0 24 24" aria-hidden="true">
-                    <path d="M12 5c5.5 0 9.6 4.1 11 7-1.4 2.9-5.5 7-11 7S2.4 14.9 1 12c1.4-2.9 5.5-7 11-7Zm0 2C7.7 7 4.4 10 3.2 12 4.4 14 7.7 17 12 17s7.6-3 8.8-5C19.6 10 16.3 7 12 7Zm0 2.5A2.5 2.5 0 1 1 12 14a2.5 2.5 0 0 1 0-5Z"/>
-                  </svg>
-                </button>
+              <div class="field">
+                <div class="label">Password</div>
+                <div class="control">
+                  <input id="password" name="password" type="password" placeholder="Password" required>
+                  <button class="icon-btn" type="button" data-toggle="password" aria-label="Toggle password visibility">
+                    <svg class="icon" viewBox="0 0 24 24" aria-hidden="true">
+                      <path d="M12 5c5.5 0 9.6 4.1 11 7-1.4 2.9-5.5 7-11 7S2.4 14.9 1 12c1.4-2.9 5.5-7 11-7Zm0 2C7.7 7 4.4 10 3.2 12 4.4 14 7.7 17 12 17s7.6-3 8.8-5C19.6 10 16.3 7 12 7Zm0 2.5A2.5 2.5 0 1 1 12 14a2.5 2.5 0 0 1 0-5Z"/>
+                    </svg>
+                  </button>
+                </div>
+              </div>
+
+              <div class="field">
+                <div class="label">Confirm Password</div>
+                <div class="control">
+                  <input id="confirmPassword" name="confirmPassword" type="password" placeholder="Confirm Password" required>
+                  <button class="icon-btn" type="button" data-toggle="confirmPassword" aria-label="Toggle confirm password visibility">
+                    <svg class="icon" viewBox="0 0 24 24" aria-hidden="true">
+                      <path d="M12 5c5.5 0 9.6 4.1 11 7-1.4 2.9-5.5 7-11 7S2.4 14.9 1 12c1.4-2.9 5.5-7 11-7Zm0 2C7.7 7 4.4 10 3.2 12 4.4 14 7.7 17 12 17s7.6-3 8.8-5C19.6 10 16.3 7 12 7Zm0 2.5A2.5 2.5 0 1 1 12 14a2.5 2.5 0 0 1 0-5Z"/>
+                    </svg>
+                  </button>
+                </div>
+              </div>
+
+              <div class="btn-row">
+                <button class="btn btn-ghost" type="button" id="btnDetailsBack">Back</button>
+                <button class="btn btn-primary" type="submit" id="btnCreateSubmit">Submit</button>
               </div>
             </div>
-
-            <div class="field">
-              <div class="label">Confirm Password</div>
-              <div class="control">
-                <input id="confirmPassword" name="confirmPassword" type="password" placeholder="Confirm Password" required>
-                <button class="icon-btn" type="button" data-toggle="confirmPassword" aria-label="Toggle confirm password visibility">
-                  <svg class="icon" viewBox="0 0 24 24" aria-hidden="true">
-                    <path d="M12 5c5.5 0 9.6 4.1 11 7-1.4 2.9-5.5 7-11 7S2.4 14.9 1 12c1.4-2.9 5.5-7 11-7Zm0 2C7.7 7 4.4 10 3.2 12 4.4 14 7.7 17 12 17s7.6-3 8.8-5C19.6 10 16.3 7 12 7Zm0 2.5A2.5 2.5 0 1 1 12 14a2.5 2.5 0 0 1 0-5Z"/>
-                  </svg>
-                </button>
-              </div>
-            </div>
-
-            <div class="btn-row">
-              <button class="btn btn-primary btn-auth-right" type="submit" id="btnCreateNext">Next</button>
-            </div>
-
-
 
             <div class="fineprint">
               By proceeding, you agree to the <span class="link">Terms of Service</span> and <span class="link">Privacy Policy</span>.<br>
@@ -623,6 +668,7 @@
             </div>
           </form>
         </div>
+
 
         <!-- LOG IN -->
         <div id="loginStep" class="auth-step" style="display:none; width:100%;">
@@ -1169,10 +1215,101 @@
     }
 
     /***********************
-     * Create Account flow
+     * Create Account flow (multi-step)
      ***********************/
+    const createStepEmail    = $("#createStepEmail");
+    const createStepPersona  = $("#createStepPersona");
+    const createStepDetails  = $("#createStepDetails");
+
+    const personaOptions = [
+      "Startup Founder",
+      "Business Owner",
+      "Corporate Executive",
+      "Sales Leader",
+      "Healthcare Professional",
+      "First Responder",
+      "Parent",
+      "Remote Professional",
+      "Shift Worker",
+      "Frequent Traveler",
+      "Athlete",
+      "Former Athlete",
+      "Retired",
+      "Military Veteran",
+      "Public Figure",
+      "Unknown"
+    ];
+
+    function showCreateSubStep(which){
+      createStepEmail.style.display   = (which === "email")   ? "block" : "none";
+      createStepPersona.style.display = (which === "persona") ? "block" : "none";
+      createStepDetails.style.display = (which === "details") ? "block" : "none";
+    }
+
+    function renderPersonaBubbles(){
+      const grid = $("#personaGrid");
+      if(!grid) return;
+      grid.innerHTML = "";
+
+      personaOptions.forEach(opt => {
+        const b = document.createElement("div");
+        b.className = "bubble";
+        b.textContent = opt;
+
+        if(answers.persona === opt) b.classList.add("selected");
+
+        b.addEventListener("click", () => {
+          answers.persona = opt;
+          // single select: rerender to update selected state
+          renderPersonaBubbles();
+        });
+
+        grid.appendChild(b);
+      });
+    }
+
+    // Init create flow
+    showCreateSubStep("email");
+    renderPersonaBubbles();
+
+    // Step 1 -> Step 2
+    $("#btnEmailNext").addEventListener("click", () => {
+      const email = $("#email").value.trim();
+      if(!email){
+        showToast("Please enter your email.");
+        return;
+      }
+      answers.email = email;
+      showCreateSubStep("persona");
+    });
+
+    // Step 2 back -> Step 1
+    $("#btnPersonaBack").addEventListener("click", () => {
+      showCreateSubStep("email");
+    });
+
+    // Step 2 -> Step 3
+    $("#btnPersonaNext").addEventListener("click", () => {
+      if(!answers.persona){
+        showToast("Please select an option.");
+        return;
+      }
+      showCreateSubStep("details");
+    });
+
+    // Step 3 back -> Step 2
+    $("#btnDetailsBack").addEventListener("click", () => {
+      showCreateSubStep("persona");
+    });
+
+    // Final submit (Step 3)
     $("#createForm").addEventListener("submit", (e) => {
       e.preventDefault();
+
+      // Only validate when on details step
+      if(createStepDetails.style.display === "none"){
+        return;
+      }
 
       const pw = $("#password").value;
       const cpw = $("#confirmPassword").value;
@@ -1186,12 +1323,19 @@
       }
 
       answers.firstName = $("#firstName").value.trim();
-      answers.lastName = $("#lastName").value.trim();
-      answers.email = $("#email").value.trim();
-      answers.phone = $("#phone").value.trim();
+      answers.lastName  = $("#lastName").value.trim();
+      answers.phone     = $("#phone").value.trim();
 
-      openOnboarding();
+      // Fake loader BEFORE onboarding
+      const loader = $("#loader");
+      loader.classList.add("active");
+
+      setTimeout(() => {
+        loader.classList.remove("active");
+        openOnboarding();
+      }, 900);
     });
+
 
     /***********************
      * Login flow
@@ -1219,4 +1363,3 @@
   </script>
 </body>
 </html>
-
